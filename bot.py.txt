@@ -1,0 +1,77 @@
+import telebot
+from telebot import types
+
+bot = telebot.TeleBot('6916328427:AAGgsyNCCO1WbdtTgaGzcv3jlJI0vRHr8yE')
+
+user_language = {}
+
+# Обработчик команды /start
+@bot.message_handler(commands=['start'])
+def start(message):
+    user_id = message.from_user.id
+    bot.send_message(user_id, "Привет! Бот готов к работе.")
+    show_language_selection(user_id)
+
+# Функция отображения выбора языка
+def show_language_selection(user_id):
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    buttons = [
+        types.InlineKeyboardButton("???? Русский", callback_data="russian"),
+        types.InlineKeyboardButton("???? Английский", callback_data="english"),
+        types.InlineKeyboardButton("???? Украинский", callback_data="ukrainian"),
+        types.InlineKeyboardButton("???? Казахский", callback_data="kazakh"),
+    ]
+    markup.add(*buttons)
+
+    bot.send_message(user_id, "Выберите язык:", reply_markup=markup)
+
+# Обработчик для кнопок выбора языка
+@bot.callback_query_handler(func=lambda call: call.data in ["russian", "english", "ukrainian", "kazakh"])
+def handle_language_selection(call):
+    user_id = call.from_user.id
+    selected_language = call.data
+
+    user_language[user_id] = selected_language
+    bot.send_message(user_id, f"Вы выбрали язык: {selected_language.capitalize()}")
+
+    # После выбора языка показываем второе окно с кнопками
+    show_second_window(user_id)
+
+# Функция отображения второго окна
+def show_second_window(user_id):
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    buttons = [
+        types.InlineKeyboardButton("Новинки", callback_data="news"),
+        types.InlineKeyboardButton("Топ", callback_data="top"),
+        types.InlineKeyboardButton("Музыкальные подборки", callback_data="playlists"),
+        types.InlineKeyboardButton("Плейлисты", callback_data="user_playlists"),
+        types.InlineKeyboardButton("Помощь", callback_data="help"),
+    ]
+    markup.add(*buttons)
+
+    bot.send_message(user_id, "Выберите раздел:", reply_markup=markup)
+
+# Обработчик для кнопок второго окна
+@bot.callback_query_handler(func=lambda call: call.data in ["news", "top", "playlists", "user_playlists", "help"])
+def handle_second_window_buttons(call):
+    user_id = call.from_user.id
+    button_text = call.data
+
+    if button_text == "news":
+        # Реализуйте логику вывода новинок
+        pass
+    elif button_text == "top":
+        # Реализуйте логику вывода топа
+        pass
+    elif button_text == "playlists":
+        # Реализуйте логику вывода музыкальных подборок
+        pass
+    elif button_text == "user_playlists":
+        # Реализуйте логику вывода плейлистов пользователя
+        pass
+    elif button_text == "help":
+        # Реализуйте логику вывода помощи и команд бота
+        pass
+
+# Запуск бота
+bot.polling(none_stop=True)
